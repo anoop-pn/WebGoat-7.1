@@ -10,9 +10,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
 
 import static com.github.ryenus.rop.OptionParser.Command;
+import org.checkerframework.checker.tainting.qual.Untainted;
 
 /**
  * ************************************************************************************************
@@ -76,5 +78,23 @@ public class Main {
     public static void main(String[] args) throws Exception {
         OptionParser parser = new OptionParser(Main.class);
         parser.parse(args);
+    }
+
+    public @Untainted String test(String s)
+    {
+        String taintedS = s+"taint";
+        return taintedS;
+    }
+
+    public void processTest(String cmd)
+    {
+        Runtime r = Runtime.getRuntime();
+        String[] argsEnv = {"Foo=bar"};
+        try{
+            Process p = r.exec(cmd, argsEnv);
+        }
+        catch(IOException e){
+            System.out.println(e);
+        }
     }
 }
